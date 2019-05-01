@@ -8,7 +8,6 @@ abstract class Organism{
     private int health;
     private int xPos;
     private int yPos;
-    private boolean finishedMove = false;
     /** Constructor
       * @param inputHealth the health given
       * @param inputXPos the x position given
@@ -64,14 +63,7 @@ abstract class Organism{
     /** getFinishedMove
       * @return if the object has moved yet
       */
-    public boolean getFinishedMove(){
-        return finishedMove;
-    }
-    /** toggleFinishedMove
-      * toggles finishedMove variable
-      */
-    public void toggleFinishedMove(){
-        finishedMove = !finishedMove;
-    }
+    abstract boolean getFinishedMove();
+    abstract void toggleFinishedMove();
 }
 

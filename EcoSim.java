@@ -1,5 +1,5 @@
 import java.util.Scanner;
-//ToDo: AI? Counter, other inputs, debug code?
+//ToDo: AI? aging? death counter?, graphics
 /**EcoSim.java
   * Eco Simulation main class
   * @author Michael Du
@@ -8,6 +8,7 @@ import java.util.Scanner;
   */
 class EcoSim{
     public static void main(String[] args){
+        final int TURNTIME = 250;
         /*
          Scanner in = new Scanner(System.in); 
          System.out.println("How big should it be");
@@ -16,9 +17,10 @@ class EcoSim{
          double plantSpawnRate = in.nextDouble();
          System.out.println("Plant Health?");
          int plantHealth = in.nextInt();
+         
          */
         int gridSize = 25;
-        double plantSpawnRate = 0.08;
+        double plantSpawnRate = 0.05;
         int plantHealth = 5;
         int numWolves =10;
         int wolfHealth = 40;
@@ -30,9 +32,9 @@ class EcoSim{
         String[][] map = new String[gridSize][gridSize];
         moveItemsOnGrid(map, organismMap);
         //Set up Grid Panel
-        DisplayGrid grid = new DisplayGrid(map);
+        DisplayGrid grid = new DisplayGrid(organismMap);
         int turnNumber = 0;
-        int[] typeNumbers;
+        int[] typeStats;
         while(true) {
             //Things to do before every turn
             organismMap.spawnPlants();
@@ -44,13 +46,13 @@ class EcoSim{
             //debug
             //DisplayGridOnConsole(map);
             turnNumber++;
-            System.out.println("Turn Number" + turnNumber);
-            typeNumbers = organismMap.getNumbers();
-            System.out.println("Current Plants" + typeNumbers[0]);
-            System.out.println("Current Sheep" + typeNumbers[1]);
-            System.out.println("Current Wolves" + typeNumbers[2]);
+            System.out.println("Turn Number: " + turnNumber);
+            typeStats = organismMap.getStats();
+            System.out.println("Current Plants: " + typeStats[0]);
+            System.out.println("Current Sheep: " + typeStats[1]);
+            System.out.println("Current Wolves: " + typeStats[2]);
             //Small delay
-            try{ Thread.sleep(200); }catch(Exception e) {};
+            try{ Thread.sleep(TURNTIME); }catch(Exception e) {};
             grid.refresh();
         }
     }

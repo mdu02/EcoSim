@@ -8,9 +8,19 @@ class Plant extends Organism{
     Plant(int inputHealth, int inputXPos, int inputYPos){
         super(inputHealth, inputXPos, inputYPos);
     }
-    /** ensures that plants will never get their moves checked
+    /**getFinishedMove 
+     * ensures that plants will never get their moves checked
+     * @return true, because plants will never move
       */
+    @Override
     public boolean getFinishedMove(){
         return true;
+    }
+    
+    /** toggleFinishedMove
+      * does literally nothing
+      */
+    @Override
+    public void toggleFinishedMove(){
     }
 }

@@ -5,6 +5,7 @@
   * @version 1.00
   */
 class SimMap{
+    private final int babyHealth = 20;
     private final int xSize;
     private final int ySize;
     private final double plantSpawnRate;
@@ -13,6 +14,7 @@ class SimMap{
     private final int wolfHealth;
     private final int numSheep;
     private final int sheepHealth;
+    private int turnNumber;
     private Organism[][] mapGrid;
     /** Constructor
       * @param inputXSize x-size of the map
@@ -36,9 +38,20 @@ class SimMap{
         this.sheepHealth = inputSheepHealth;
         this.mapGrid = new Organism[this.ySize][this.xSize];
     }
-    
+    /**getXSize
+      * @return the x-size
+      */
+    public int getXSize(){
+        return this.xSize;
+    }
+      /**getYSize
+      * @return the y-size
+      */
+    public int getYSize(){
+        return this.ySize;
+    }
     /** returnString
-      * @returns the string at a given position
+      * @return the string at a given position
       */
     public String returnString(int xCoord, int yCoord){
         if (mapGrid[xCoord][yCoord] instanceof Wolf){
@@ -50,7 +63,28 @@ class SimMap{
         }
         return "4";
     }
-    
+    /** returnHealth
+      * @return the health at a given position
+      */
+    public int returnHealth(int xCoord, int yCoord){
+        if (mapGrid[xCoord][yCoord] instanceof Organism){
+            return mapGrid[xCoord][yCoord].getHealth();
+        }
+        return 0;
+    }
+    /* returnGender
+     * @return the gender of a given position
+     */
+    public String returnGender(int xCoord, int yCoord){
+        if (mapGrid[xCoord][yCoord] instanceof Animal){
+            if (((Animal)mapGrid[xCoord][yCoord]).getGender()){
+                return "M";
+            } else {
+                return "F";
+            }
+        }
+        return "";
+    }
     /** spawnPlants
       * spawns plants with a frequency given by the object's variables
       */
@@ -119,7 +153,7 @@ class SimMap{
                     int i2;
                     int j2;
                     do {
-                        int[]newCoords = ((Animal)this.mapGrid[i][j]).makeMove();
+                        int[]newCoords = ((Animal)this.mapGrid[i][j]).makeMove(this.mapGrid, 2*this.babyHealth);
                         i2 = newCoords[0];
                         j2 = newCoords[1];
                     } while (i2 >= this.xSize || j2>= this.ySize || i2 < 0 || j2 < 0);
@@ -127,19 +161,22 @@ class SimMap{
                     if (this.mapGrid[i][j] instanceof Wolf && this.mapGrid[i2][j2] instanceof Sheep){
                         this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() + this.mapGrid[i2][j2].getHealth());
                         this.mapGrid[i2][j2] = this.mapGrid[i][j];
+                        this.mapGrid[i2][j2].setXPos(i2);
+                        this.mapGrid[i2][j2].setYPos(j2);
                         this.mapGrid[i2][j2].toggleFinishedMove();
                         this.mapGrid[i][j] = null;
                     }
-                    //sheep eats wolf
+                    //sheep eaten by wolf
                     else if (this.mapGrid[i][j] instanceof Sheep && this.mapGrid[i2][j2] instanceof Wolf){
                         this.mapGrid[i2][j2].setHealth(this.mapGrid[i][j].getHealth() + this.mapGrid[i2][j2].getHealth());
-                        this.mapGrid[i][j] = this.mapGrid[i2][j2];
-                        this.mapGrid[i][j].toggleFinishedMove();
-                        this.mapGrid[i2][j2] = null;
+                        this.mapGrid[i2][j2].toggleFinishedMove();
+                        this.mapGrid[i][j] = null;
                     }
                     // wolf tramples grass
                     else if (this.mapGrid[i][j] instanceof Wolf && this.mapGrid[i2][j2] instanceof Plant){
                         this.mapGrid[i2][j2] = this.mapGrid[i][j];
+                        this.mapGrid[i2][j2].setXPos(i2);
+                        this.mapGrid[i2][j2].setYPos(j2);
                         this.mapGrid[i2][j2].toggleFinishedMove();
                         this.mapGrid[i][j] = null;
                     }
@@ -147,38 +184,54 @@ class SimMap{
                     else if (this.mapGrid[i][j] instanceof Sheep && this.mapGrid[i2][j2] instanceof Plant){
                         this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() + this.mapGrid[i2][j2].getHealth());
                         this.mapGrid[i2][j2] = this.mapGrid[i][j];
+                        this.mapGrid[i2][j2].setXPos(i2);
+                        this.mapGrid[i2][j2].setYPos(j2);
                         this.mapGrid[i2][j2].toggleFinishedMove();
                         this.mapGrid[i][j] = null;
                     }
                     // sheep breed
-                    else if (this.mapGrid[i][j] instanceof Sheep && this.mapGrid[i][j].getHealth() >= 20
-                                 && this.mapGrid[i2][j2] instanceof Sheep && this.mapGrid[i2][j2].getHealth() >= 20
+                    else if (this.mapGrid[i][j] instanceof Sheep && this.mapGrid[i][j].getHealth() >= (this.babyHealth*2)
+                                 && this.mapGrid[i2][j2] instanceof Sheep && this.mapGrid[i2][j2].getHealth() >= (this.babyHealth*2)
                                  && ((Animal)this.mapGrid[i2][j2]).getGender() != ((Animal)this.mapGrid[i][j]).getGender()){
-                        this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() -10);
+                        this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() -this.babyHealth);
                         this.mapGrid[i][j].toggleFinishedMove();
-                        this.mapGrid[i2][j2].setHealth(this.mapGrid[i2][j2].getHealth() -10);
+                        this.mapGrid[i2][j2].setHealth(this.mapGrid[i2][j2].getHealth() -this.babyHealth);
                         this.mapGrid[i2][j2].toggleFinishedMove();
-                        spawnAnimal(false, 10);
+                        spawnAnimal(false, this.babyHealth);      
+                    }
+                    //same gendered sheep (sheep are not agressive)
+                    else if (this.mapGrid[i][j] instanceof Sheep && this.mapGrid[i2][j2] instanceof Sheep
+                                 && ((Animal)this.mapGrid[i2][j2]).getGender() == ((Animal)this.mapGrid[i][j]).getGender()){
+                        this.mapGrid[i][j].toggleFinishedMove();
+                    }
+                     //same gendered wolves (FIGHT!)
+                    else if (this.mapGrid[i][j] instanceof Wolf && this.mapGrid[i2][j2] instanceof Wolf
+                                 && ((Animal)this.mapGrid[i2][j2]).getGender() == ((Animal)this.mapGrid[i][j]).getGender()){
+                        
+                        this.mapGrid[i][j].toggleFinishedMove();
                         
                     }
-                    //wolf breed? maybe later
-                    else if (this.mapGrid[i][j] instanceof Wolf && this.mapGrid[i][j].getHealth() >= 20
-                                 && this.mapGrid[i2][j2] instanceof Wolf && this.mapGrid[i2][j2].getHealth() >= 20
+                    //wolf breed
+                    else if (this.mapGrid[i][j] instanceof Wolf && this.mapGrid[i][j].getHealth() >= (this.babyHealth*2)
+                                 && this.mapGrid[i2][j2] instanceof Wolf && this.mapGrid[i2][j2].getHealth() >= (this.babyHealth*2)
                                  && ((Animal)this.mapGrid[i2][j2]).getGender() != ((Animal)this.mapGrid[i][j]).getGender()){
-                        this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() -10);
+                        this.mapGrid[i][j].setHealth(this.mapGrid[i][j].getHealth() -this.babyHealth);
                         this.mapGrid[i][j].toggleFinishedMove();
-                        this.mapGrid[i2][j2].setHealth(this.mapGrid[i2][j2].getHealth() -10);
+                        this.mapGrid[i2][j2].setHealth(this.mapGrid[i2][j2].getHealth() -this.babyHealth);
                         this.mapGrid[i2][j2].toggleFinishedMove();
-                        spawnAnimal(true, 10);
+                        spawnAnimal(true, this.babyHealth);
                     }
                     else{
                         this.mapGrid[i2][j2] = this.mapGrid[i][j];
+                        this.mapGrid[i2][j2].setXPos(i2);
+                        this.mapGrid[i2][j2].setYPos(j2);
                         this.mapGrid[i2][j2].toggleFinishedMove();
                         this.mapGrid[i][j] = null;
                     }
                 }
             }
         }
+        this.turnNumber ++;
     }
     /** setFalse
       * resets all animals to false for next turn around
@@ -192,12 +245,12 @@ class SimMap{
             }
         }
     }
-    /** getNumbers
+    /** getStats
       * gets number of each type
-      * @return an array of number of plants, sheep, wolves
+      * @return an array of number of plants, sheep, wolves, turn number
       */
-    public int[] getNumbers(){
-        int[] numberArray = {0,0,0};
+    public int[] getStats(){
+        int[] numberArray = {0,0,0,0};
         for (int i = 0; i<this.xSize; i++){
             for (int j = 0; j<this.ySize; j++){
                 if (this.mapGrid[i][j] instanceof Plant){
@@ -209,6 +262,7 @@ class SimMap{
                 }
             }
         }
+        numberArray[3] = this.turnNumber;
         return numberArray;
     }
 }

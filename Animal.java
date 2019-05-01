@@ -8,6 +8,7 @@ abstract class Animal extends Organism{
     private int[] movesX = {1,0,-1,0};
     private int[] movesY = {0,1,0,-1};
     private boolean isMale;
+    private boolean finishedMove = false;
     Animal(int inputHealth, int inputXPos, int inputYPos){
         super(inputHealth, inputXPos, inputYPos);
         if (Math.random() < 0.5){
@@ -17,11 +18,9 @@ abstract class Animal extends Organism{
     /** makeMove
       * @return the new coords
       */
-    public int[] makeMove(){
+    public int[] makeMove(Organism[][]map, int healthThreshold){
         int i = (int)(Math.random()*4);
         int[] returnArray = {this.getXPos() +movesX[i], this.getYPos() +movesY[i]};
-        this.setXPos(this.getXPos() +movesX[i]);
-        this.setYPos(this.getYPos() +movesY[i]);
         return returnArray;
     }
     /** getGender
@@ -29,5 +28,17 @@ abstract class Animal extends Organism{
       */
     public boolean getGender(){
         return this.isMale;
+    }
+     /** getFinishedMove
+      * @return if moves are finished yet
+      */
+    public boolean getFinishedMove(){
+        return this.finishedMove;
+    }   
+    /** toggleFinishedMove
+      * toggles finishedMove variable
+      */
+    public void toggleFinishedMove(){
+        finishedMove = !finishedMove;
     }
 }
