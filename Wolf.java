@@ -5,9 +5,11 @@
   * @version 1.00
   */
 class Wolf extends Animal implements Comparable<Wolf>{
-    Wolf(int inputHealth, int inputXPos, int inputYPos){
+    Wolf(int inputHealth, int inputXPos, int inputYPos, int newMaxHealth){
         super(inputHealth, inputXPos, inputYPos);
+        this.setMaxHealth(newMaxHealth);
     }
+    
     public int compareTo(Wolf otherWolf){
         if (this.getHealth() > otherWolf.getHealth()){
             return 1;

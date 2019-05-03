@@ -27,7 +27,7 @@ abstract class Organism{
     }
     /** setHealth
       * sets health
-      * @param health to be set
+      * @param the health to be set
       */
     public void setHealth(int newHealth){
         this.health = newHealth;
@@ -60,10 +60,9 @@ abstract class Organism{
     public void setYPos(int newYPos){
         this.yPos = newYPos;
     }
-    /** getFinishedMove
+    /** cantMove
       * @return if the object has moved yet
       */
-    abstract boolean getFinishedMove();
-    abstract void toggleFinishedMove();
+    abstract boolean cantMove();
 }
 

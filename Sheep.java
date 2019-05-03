@@ -7,8 +7,9 @@
 class Sheep extends Animal{
     private int[] movesX = {1,0,-1,0};
     private int[] movesY = {0,1,0,-1};
-    Sheep(int inputHealth, int inputXPos, int inputYPos){
+    Sheep(int inputHealth, int inputXPos, int inputYPos, int newMaxHealth){
         super(inputHealth, inputXPos, inputYPos);
+        this.setMaxHealth(newMaxHealth);
     }
     /** makeMove
       * Greedy algorithm b/c sheep are dumb; will seek out an opposite-gendered animal if they can both mate b/c biology
@@ -54,4 +55,7 @@ class Sheep extends Animal{
         returnArray[1] = this.getYPos() +movesY[i];
         return returnArray;
     }
+    /** inGrid
+      * gets rid of having to have like six conditions?
+      */
 }
