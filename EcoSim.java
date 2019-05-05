@@ -1,39 +1,83 @@
 import java.util.Scanner;
-//ToDo: AI? aging? death counter?, graphics?breeding cooldown? grass spread? different grids
-//display stuff on different ticks from other loop
-//takes only 1/10 of the health from each sheep
+import java.io.IOException;
 /**EcoSim.java
   * Eco Simulation main class
   * @author Michael Du
   * @since 2019-04-17
   * @version 1.00
   */
+
+/*Things that this game implements
+ * self-made graphics of questionable quality
+ * A separate grid for animals and plants
+ * Age has been set up, but this is really hard to balance right. go to the animal class and uncomment the line to try it
+ * (as of now, animals will die if their age reaches Integer.MAX_VALUE
+ * Sheep and Wolves both have a greedy algorithm which looks to 1. breed 2. eat in their immediate vicinity
+ * Both animals have a gender, which is randomly set, and determines their behaviour adjacent to the same species
+ * counts deaths of each species, including plants
+ */
 class EcoSim{
-    public static void main(String[] args){
-        final int TURNTIME = 150;
-        /*
-         Scanner in = new Scanner(System.in); 
-         System.out.println("How big should it be");
-         int gridSize = in.nextInt();
-         System.out.println("Plant Spawn Rate?");
-         double plantSpawnRate = in.nextDouble();
-         System.out.println("Plant Health?");
-         int plantHealth = in.nextInt();
-         */
-        int gridSize = 25;
-        double plantSpawnRate = 0.05;
-        int plantHealth = 20;
-        int numWolves =10;
-        int wolfHealth = 40;
-        int wolfMaxHealth = 200;
-        int numSheep = 60;
-        int sheepHealth = 25;
-        int sheepMaxHealth = 100;
+    public static void main(String[] args) throws IOException{
+        int turntime;
+        int gridSize;
+        double plantSpawnRate;
+        int plantHealth;
+        int numWolves;
+        int wolfHealth;
+        int wolfMaxHealth;
+        int numSheep;
+        int sheepHealth;
+        int sheepMaxHealth;
+        Scanner in = new Scanner(System.in);
+        System.out.println("Use Own Settings? Enter Y/N: ");
+        String settings = in.next();
+        
+        if (settings == "Y"){
+            System.out.println("How many ms should each turn be?");
+            turntime = in.nextInt();
+            System.out.println("How big should it be (ideally less than 40)");
+            gridSize = in.nextInt();
+            System.out.println("Plant Spawn Rate (between 0 and 1)?");
+            plantSpawnRate = in.nextDouble();
+            System.out.println("Plant Health?");
+            plantHealth = in.nextInt();
+            System.out.println("Number of Wolves?");
+            numWolves = in.nextInt();
+            System.out.println("Wolf Health?");
+            wolfHealth = in.nextInt();
+            System.out.println("Wolf Health Cap?");
+            wolfMaxHealth = in.nextInt();
+            System.out.println("Number of Sheep?");
+            numSheep = in.nextInt();
+            System.out.println("Sheep Health?");
+            sheepHealth = in.nextInt();
+            System.out.println("Sheep Health Cap?");
+            sheepMaxHealth = in.nextInt();
+        } else {
+            turntime = 500;
+            gridSize = 40;
+            plantSpawnRate = 0.08;
+            plantHealth = 20;
+            numWolves = 8;
+            wolfHealth = 50;
+            wolfMaxHealth = 200;
+            numSheep = 300;
+            sheepHealth = 25;
+            sheepMaxHealth = 100;
+//            turntime = 3000;
+//            gridSize = 5;
+//            plantSpawnRate = 0.25;
+//            plantHealth = 20;
+//            numWolves = 1;
+//            wolfHealth = 50;
+//            wolfMaxHealth = 200;
+//            numSheep = 8;
+//            sheepHealth = 25;
+//            sheepMaxHealth = 100;
+        }
         SimMap organismMap = new SimMap(gridSize, gridSize, plantSpawnRate, plantHealth, numWolves,
                                         wolfHealth, wolfMaxHealth, numSheep, sheepHealth, sheepMaxHealth);
         organismMap.initializeAnimals();
-        String[][] map = new String[gridSize][gridSize];
-        moveItemsOnGrid(map, organismMap);
         //Set up Grid Panel
         DisplayGrid grid = new DisplayGrid(organismMap);
         int turnNumber = 0;
@@ -44,35 +88,17 @@ class EcoSim{
             organismMap.moveAnimals();
             organismMap.setFalse();
             organismMap.removeHealth();
-            //refresh things
-            moveItemsOnGrid(map, organismMap);
-            //debug
-            //DisplayGridOnConsole(map);
-            turnNumber++;
-            System.out.println("Turn Number: " + turnNumber);
-            typeStats = organismMap.getStats();
-            System.out.println("Current Plants: " + typeStats[0]);
-            System.out.println("Current Sheep: " + typeStats[1]);
-            System.out.println("Current Wolves: " + typeStats[2]);
+            organismMap.addAge();
+//         console output
+//            turnNumber++;
+//            System.out.println("Turn Number: " + turnNumber);
+//            typeStats = organismMap.getStats();
+//            System.out.println("Current Plants: " + typeStats[0]);
+//            System.out.println("Current Sheep: " + typeStats[1]);
+//            System.out.println("Current Wolves: " + typeStats[2]);
             //Small delay
-            try{ Thread.sleep(TURNTIME); }catch(Exception e) {};
+            try{ Thread.sleep(turntime); }catch(Exception e) {};
             grid.refresh();
         } while (!organismMap.gameEnded());
-    }
-    public static void moveItemsOnGrid(String[][] map, SimMap simMap) { 
-        for(int i = 0; i<map[0].length;i++){
-            for(int j = 0; j<map.length;j++){ 
-                map[i][j]= simMap.returnString(i,j);
-            }
-        }
-    }
-    
-    //DEBUG CODE REMOVE LATER
-    public static void DisplayGridOnConsole(String[][] map) { 
-        for(int i = 0; i<map.length;i++){        
-            for(int j = 0; j<map[0].length;j++) 
-                System.out.print(map[i][j]+" ");
-            System.out.println("");
-        }
     }
 }

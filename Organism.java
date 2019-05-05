@@ -32,7 +32,7 @@ abstract class Organism{
     public void setHealth(int newHealth){
         this.health = newHealth;
     }
-     /** getXPos
+    /** getXPos
       * gets xPos
       * @returns organism x position
       */
@@ -60,9 +60,5 @@ abstract class Organism{
     public void setYPos(int newYPos){
         this.yPos = newYPos;
     }
-    /** cantMove
-      * @return if the object has moved yet
-      */
-    abstract boolean cantMove();
 }
 
